@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.Utilities;
 
 namespace HighlightLine
 {
-	// Establishes an IAdornmentLayer to place the adornment on and exports the <see IWpfTextViewCreationListener
+	// Establishes an IAdornmentLayer to place the adornment on and exports the IWpfTextViewCreationListener
 	// that instantiates the adornment on the event of a IWpfTextView's creation
 	[Export(typeof(IWpfTextViewCreationListener))]
 	[ContentType("text")]

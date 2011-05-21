@@ -8,22 +8,22 @@ using Microsoft.VisualStudio.Text.Formatting;
 namespace HighlightLine
 {
 	// HighlightLine places red boxes behind all the "A"s in the editor window
-	public class HighlightLine
+	internal class HighlightLine
 	{
 		public HighlightLine(IWpfTextView view)
 		{
 			m_view = view;
 			m_layer = view.GetAdornmentLayer("HighlightLine");
 
-			//Listen to any event that changes the layout (text changes, scrolling, etc)
+			// Listen to any event that changes the layout (text changes, scrolling, etc)
 			m_view.LayoutChanged += OnLayoutChanged;
 
 			//Create the pen and brush to color the box behind the a's
-			Brush brush = new SolidColorBrush(Color.FromArgb(0x20, 0x00, 0x00, 0xff));
+			var brush = new SolidColorBrush(Color.FromArgb(0x20, 0x00, 0x00, 0xff));
 			brush.Freeze();
-			Brush penBrush = new SolidColorBrush(Colors.Red);
+			var penBrush = new SolidColorBrush(Colors.Red);
 			penBrush.Freeze();
-			Pen pen = new Pen(penBrush, 0.5);
+			var pen = new Pen(penBrush, 0.5);
 			pen.Freeze();
 
 			m_brush = brush;
@@ -43,30 +43,30 @@ namespace HighlightLine
 		// Within the given line add the scarlet box behind the a
 		private void CreateVisuals(ITextViewLine line)
 		{
-			//grab a reference to the lines in the current TextView 
+			// grab a reference to the lines in the current TextView 
 			IWpfTextViewLineCollection textViewLines = m_view.TextViewLines;
 			int start = line.Start;
 			int end = line.End;
 
-			//Loop through each character, and place a box around any a 
+			// Loop through each character, and place a box around any a 
 			for (int i = start; (i < end); ++i)
 			{
 				if (m_view.TextSnapshot[i] == 'a')
 				{
-					SnapshotSpan span = new SnapshotSpan(m_view.TextSnapshot, Span.FromBounds(i, i + 1));
+					var span = new SnapshotSpan(m_view.TextSnapshot, Span.FromBounds(i, i + 1));
 					Geometry g = textViewLines.GetMarkerGeometry(span);
 					if (g != null)
 					{
-						GeometryDrawing drawing = new GeometryDrawing(m_brush, m_pen, g);
+						var drawing = new GeometryDrawing(m_brush, m_pen, g);
 						drawing.Freeze();
 
-						DrawingImage drawingImage = new DrawingImage(drawing);
+						var drawingImage = new DrawingImage(drawing);
 						drawingImage.Freeze();
 
-						Image image = new Image();
+						var image = new Image();
 						image.Source = drawingImage;
 
-						//Align the image with the top of the bounds of the text geometry
+						// Align the image with the top of the bounds of the text geometry
 						Canvas.SetLeft(image, g.Bounds.Left);
 						Canvas.SetTop(image, g.Bounds.Top);
 
