@@ -60,7 +60,7 @@ namespace HighlightLine
 				SnapshotSpan span = startLine.Extent;
 				Rect area = new Rect(
 				   new Point(startLine.Left, startLine.Top),
-				   new Point(Math.Max(m_view.ViewportRight - 2, startLine.Right), startLine.Bottom)
+				   new Point(Math.Max(m_view.ViewportRight - 2, startLine.Right), startLine.Bottom)	// TODO: height isn't always right for documents that use different font sizes
 				);
 
 				if (DoNeedsNewImage(area) || m_fillBrush == null)
