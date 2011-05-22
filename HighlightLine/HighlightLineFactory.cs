@@ -1,9 +1,34 @@
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudio.Text.Classification;
+using System.Windows.Media;
 
 namespace HighlightLine
 {
+	// Magic code based on the LineAdornment example.
+	static class CurrentLineClassificationDefinition
+	{
+		[Export(typeof(ClassificationTypeDefinition))]
+		[Name("HighlightLine")]
+		internal static ClassificationTypeDefinition CurrentLineClassificationType = null;
+	}
+
+	[Export(typeof(EditorFormatDefinition))]
+	[ClassificationType(ClassificationTypeNames = "HighlightLine")]
+	[Name("HighlightLine")]
+	[UserVisible(true)]
+	[Order(Before = Priority.Default)]
+	sealed class CurrentLineFormat : ClassificationFormatDefinition
+	{
+		public CurrentLineFormat()
+		{
+			this.BackgroundColor = Colors.Teal;
+			this.ForegroundColor = Colors.DarkCyan;
+			this.BackgroundOpacity = 0.3;
+		}
+	}
+
 	// Establishes an IAdornmentLayer to place the adornment on and exports the IWpfTextViewCreationListener
 	// that instantiates the adornment on the event of a IWpfTextView's creation
 	[Export(typeof(IWpfTextViewCreationListener))]
@@ -11,18 +36,25 @@ namespace HighlightLine
 	[TextViewRole(PredefinedTextViewRoles.Document)]
 	internal sealed class HighlightLineFactory : IWpfTextViewCreationListener
 	{
+		[Import]
+		public IClassificationTypeRegistryService ClassificationRegistry = null;
+		[Import]
+		public IClassificationFormatMapService FormatMapService = null;
+
 		// Defines the adornment layer for the adornment. This layer is ordered 
 		// after the selection layer in the Z-order
 		[Name("HighlightLine")]
 		[Export(typeof(AdornmentLayerDefinition))]
-		[Order(After = PredefinedAdornmentLayers.Selection, Before = PredefinedAdornmentLayers.Text)]
+		[Order(Before = "Selection")]
 		[TextViewRole(PredefinedTextViewRoles.Document)]
 		public AdornmentLayerDefinition editorAdornmentLayer = null;
 
 		// Instantiates a HighlightLine manager when a textView is created.
 		public void TextViewCreated(IWpfTextView textView)
 		{
-			new HighlightLine(textView);
+			IClassificationType classification = ClassificationRegistry.GetClassificationType("HighlightLine");
+			IClassificationFormatMap map = FormatMapService.GetClassificationFormatMap(textView);
+			new HighlightLine(textView, map, classification);
 		}
 	}
 }
