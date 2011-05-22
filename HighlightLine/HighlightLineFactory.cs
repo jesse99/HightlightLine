@@ -23,9 +23,9 @@ namespace HighlightLine
 	{
 		public CurrentLineFormat()
 		{
-			this.BackgroundColor = Colors.Teal;
-			this.ForegroundColor = Colors.DarkCyan;
-			this.BackgroundOpacity = 0.3;
+			BackgroundColor = Colors.Teal;
+			ForegroundColor = Colors.DarkCyan;
+			BackgroundOpacity = 0.3;
 		}
 	}
 
