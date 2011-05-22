@@ -20,17 +20,16 @@ namespace HighlightLine
 			m_formatType = formatType;
 
 			// Listen to any event that changes the layout (text changes, scrolling, etc)
-			m_view.Caret.PositionChanged += DoCaretPositionChanged;
 			m_view.LayoutChanged += DoLayoutChanged;
-			m_view.ViewportWidthChanged += DoViewportWidthChanged;
-			m_view.ViewportLeftChanged += DoViewportLeftChanged;
-			m_view.Selection.SelectionChanged += DoSelectionChanged;
+			m_view.ViewportWidthChanged += (s, e) => DoDraw();
+			m_view.ViewportLeftChanged += (s, e) => DoDraw();
+			m_view.Selection.SelectionChanged += (s, e) => DoDraw();
+			formatMap.ClassificationFormatMappingChanged += (s, e) => DoReset();
 
 			// Create the brush we'll used to highlight the current line. The color will be
 			// the CurrentLine property from the Fonts and Colors panel in the Options dialog.
 			TextFormattingRunProperties format = formatMap.GetTextProperties(formatType);
 			m_fillBrush = format.BackgroundBrush;
-			DoRedraw();
 		}
 
 		#region Private Methods
@@ -41,91 +40,58 @@ namespace HighlightLine
 			{
 				if (line.ContainsBufferPosition(caret))
 				{
-					m_adornment = null; // force recalculation
-					DoCreateVisuals(line);
+					DoReset();
 					break;
 				}
 			}
 		}
 
-		void DoViewportLeftChanged(object sender, EventArgs e)
+		private void DoReset()
 		{
-			DoRedraw();
+			m_layer.RemoveAdornmentsByTag(AdornmentName);
+			m_adornment = null;
+			DoDraw();
 		}
 
-		void DoViewportWidthChanged(object sender, EventArgs e)
-		{
-			DoRedraw();
-		}
-		
-		private void DoCaretPositionChanged(object sender, CaretPositionChangedEventArgs e)
-		{
-			ITextViewLine newLine = DoGetLineByPos(e.NewPosition.BufferPosition);
-			ITextViewLine oldLine = DoGetLineByPos(e.OldPosition.BufferPosition);
-			if (newLine != oldLine)
-			{
-				m_layer.RemoveAdornmentsByTag(AdornmentName);
-				DoCreateVisuals(newLine);
-			}
-		}
-
-		// If the selection extends over more than one line then it is not helpful to highlight the
-		// current line (and it looks dorky to do so as can be seen with the LineAdornment extension).
-		private void DoSelectionChanged(object sender, EventArgs e)
+		private void DoDraw()
 		{
 			ITextViewLine startLine = DoGetLineByPos(m_view.Selection.Start.Position);
 			ITextViewLine endLine = DoGetLineByPos(m_view.Selection.End.Position);
-			if (startLine == endLine)
+
+			// If the selection extends over more than one line then it is not helpful to highlight the
+			// current line (and it looks dorky to do so as can be seen with the LineAdornment extension).
+			if (startLine == endLine && m_view.TextViewLines != null)
 			{
+				SnapshotSpan span = startLine.Extent;
+				Rect area = new Rect(
+				   new Point(startLine.Left, startLine.Top),
+				   new Point(Math.Max(m_view.ViewportRight - 2, startLine.Right), startLine.Bottom)
+				);
+
+				if (DoNeedsNewImage(area))
+					m_adornment = DoCreateAdornment(area);
+
 				m_layer.RemoveAdornmentsByTag(AdornmentName);
-				DoCreateVisuals(startLine);
+				DoAddAdornment(startLine, area);
 			}
-			else
+			else if (m_adornment != null)
 			{
 				m_layer.RemoveAdornmentsByTag(AdornmentName);
 				m_adornment = null;
 			}
 		}
 
-		private void DoRedraw()
-		{
-			if (m_view.TextViewLines != null)
-			{
-				if (m_adornment != null)
-				{
-					m_layer.RemoveAdornment(m_adornment);
-					m_adornment = null; // force redraw
-				}
-
-				var caret = m_view.Caret.Position;
-				ITextViewLine line = DoGetLineByPos(caret.BufferPosition);
-				DoCreateVisuals(line);
-			}
-		}
-		
-		// Within the given line add the scarlet box behind the a
-		private void DoCreateVisuals(ITextViewLine line)
+		private void DoAddAdornment(ITextViewLine line, Rect area)
 		{
 			IWpfTextViewLineCollection textViewLines = m_view.TextViewLines;
-			if (textViewLines != null)
-			{
-				SnapshotSpan span = line.Extent;
-				Rect area = new Rect(
-				   new Point(line.Left, line.Top),
-				   new Point(Math.Max(m_view.ViewportRight - 2, line.Right), line.Bottom)
-				);
 
-				if (DoNeedsNewImage(area))
-					m_adornment = DoCreateAdornment(area);
+			// Align the image with the top of the bounds of the text geometry
+			Canvas.SetLeft(m_adornment, area.Left);
+			Canvas.SetTop(m_adornment, area.Top);
 
-				// Align the image with the top of the bounds of the text geometry
-				Canvas.SetLeft(m_adornment, area.Left);
-				Canvas.SetTop(m_adornment, area.Top);
-
-				m_layer.AddAdornment(
-				   AdornmentPositioningBehavior.TextRelative, span,
-				   AdornmentName, m_adornment, null);
-			}			
+			m_layer.AddAdornment(
+				AdornmentPositioningBehavior.TextRelative, line.Extent,
+				AdornmentName, m_adornment, null);
 		}
 
 		// Unlike the LineAdornment extension we do not add a border (a border adds a bit too much
