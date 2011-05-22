@@ -1,11 +1,8 @@
-* Drop in the LineAdornment code.
-* Make sure that it builds and runs.
-* Get rid of the black border (distracting and screws up insertion point when it is at the start of a line).
-* Only draw the adornment if the selection is entirely within a single line.
 * Adornment height is sometimes wrong. When the document uses different fonts?
 * Review the manifest.
 * Install it
 * Try it out for a while.
 * Add an asciidoc readme.
+* Create a release checklist.
 * Release on github.
 * Release on the gallery.

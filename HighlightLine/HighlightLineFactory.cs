@@ -7,19 +7,19 @@ using System.Windows.Media;
 namespace HighlightLine
 {
 	// Magic code based on the LineAdornment example.
-	static class CurrentLineClassificationDefinition
+	static internal class CurrentLineClassificationDefinition
 	{
 		[Export(typeof(ClassificationTypeDefinition))]
-		[Name("HighlightLine")]
+		[Name("CurrentLine")]
 		internal static ClassificationTypeDefinition CurrentLineClassificationType = null;
 	}
 
 	[Export(typeof(EditorFormatDefinition))]
-	[ClassificationType(ClassificationTypeNames = "HighlightLine")]
-	[Name("HighlightLine")]
+	[ClassificationType(ClassificationTypeNames = "CurrentLine")]
+	[Name("CurrentLine")]
 	[UserVisible(true)]
 	[Order(Before = Priority.Default)]
-	sealed class CurrentLineFormat : ClassificationFormatDefinition
+	internal sealed class CurrentLineFormat : ClassificationFormatDefinition
 	{
 		public CurrentLineFormat()
 		{
@@ -43,7 +43,7 @@ namespace HighlightLine
 
 		// Defines the adornment layer for the adornment. This layer is ordered 
 		// after the selection layer in the Z-order
-		[Name("HighlightLine")]
+		[Name("CurrentLine")]
 		[Export(typeof(AdornmentLayerDefinition))]
 		[Order(Before = "Selection")]
 		[TextViewRole(PredefinedTextViewRoles.Document)]
@@ -52,7 +52,7 @@ namespace HighlightLine
 		// Instantiates a HighlightLine manager when a textView is created.
 		public void TextViewCreated(IWpfTextView textView)
 		{
-			IClassificationType classification = ClassificationRegistry.GetClassificationType("HighlightLine");
+			IClassificationType classification = ClassificationRegistry.GetClassificationType("CurrentLine");
 			IClassificationFormatMap map = FormatMapService.GetClassificationFormatMap(textView);
 			new HighlightLine(textView, map, classification);
 		}

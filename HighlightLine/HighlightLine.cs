@@ -9,13 +9,13 @@ using Microsoft.VisualStudio.Text.Classification;
 
 namespace HighlightLine
 {
-	// HighlightLine places red boxes behind all the "A"s in the editor window
+	// Use a custom background color for the line the caret is within.
 	internal class HighlightLine
 	{
 		public HighlightLine(IWpfTextView view, IClassificationFormatMap formatMap, IClassificationType formatType)
 		{
 			m_view = view;
-			m_layer = view.GetAdornmentLayer("HighlightLine");
+			m_layer = view.GetAdornmentLayer("CurrentLine");
 			m_formatMap = formatMap;
 			m_formatType = formatType;
 
@@ -24,12 +24,7 @@ namespace HighlightLine
 			m_view.ViewportWidthChanged += (s, e) => DoDraw();
 			m_view.ViewportLeftChanged += (s, e) => DoDraw();
 			m_view.Selection.SelectionChanged += (s, e) => DoDraw();
-			formatMap.ClassificationFormatMappingChanged += (s, e) => DoReset();
-
-			// Create the brush we'll used to highlight the current line. The color will be
-			// the CurrentLine property from the Fonts and Colors panel in the Options dialog.
-			TextFormattingRunProperties format = formatMap.GetTextProperties(formatType);
-			m_fillBrush = format.BackgroundBrush;
+			formatMap.ClassificationFormatMappingChanged += (s, e) => { m_fillBrush = null; DoReset(); };
 		}
 
 		#region Private Methods
@@ -68,7 +63,7 @@ namespace HighlightLine
 				   new Point(Math.Max(m_view.ViewportRight - 2, startLine.Right), startLine.Bottom)
 				);
 
-				if (DoNeedsNewImage(area))
+				if (DoNeedsNewImage(area) || m_fillBrush == null)
 					m_adornment = DoCreateAdornment(area);
 
 				m_layer.RemoveAdornmentsByTag(AdornmentName);
@@ -98,6 +93,14 @@ namespace HighlightLine
 		// visual noise and makes it hard to see the insertion point when it is in the first column).
 		private Image DoCreateAdornment(Rect area)
 		{
+			// Create the brush we'll used to highlight the current line. The color will be
+			// the CurrentLine property from the Fonts and Colors panel in the Options dialog.
+			if (m_fillBrush == null)
+			{
+				TextFormattingRunProperties format = m_formatMap.GetTextProperties(m_formatType);
+				m_fillBrush = format.BackgroundBrush;
+			}
+
 			var drawing = new GeometryDrawing();
 			drawing.Brush = m_fillBrush;
 			drawing.Geometry = new RectangleGeometry(area, 1.0, 1.0);
