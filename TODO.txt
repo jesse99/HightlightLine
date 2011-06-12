@@ -1,8 +1,5 @@
-* Adornment height is sometimes wrong. When the document uses different fonts?
-* Review the manifest.
-* Install it
-* Try it out for a while.
-* Add an asciidoc readme.
+asciidoc --backend=xhtml11 --out-file=README.html README.asciidoc && open README.html
+
 * Create a release checklist.
 * Release on github.
 * Release on the gallery.

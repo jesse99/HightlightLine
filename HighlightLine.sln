@@ -5,6 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HighlightLine", "HighlightL
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EDB277E3-3342-45D1-8178-0B5E32A11DC6}"
 	ProjectSection(SolutionItems) = preProject
+		README.asciidoc = README.asciidoc
 		TODO.txt = TODO.txt
 	EndProjectSection
 EndProject

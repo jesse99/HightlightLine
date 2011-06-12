@@ -1,0 +1,20 @@
+HighLightLine 1.0
+=================
+
+HighLightLine is an extension for Visual Studio 2010 that sets the background color of the current line
+to a user settable value. It's based on the http://visualstudiogallery.msdn.microsoft.com/0cc4c4c5-0f0b-4c6b-a269-3e0c1603d516[LineAdornments]
+addon except that HighlightLine:
+
+* Doesn't add a border around the current line.
+* Does not highlight lines if the selection crosses multiple lines.
+
+To change the highlight color open the Options item in the Tools menu, go to the Environment
+tab, select "Current Line" from the Display Items list, and set the background color.
+
+To install exit studio and double-click the vsix file. To uninstall use the Extension Manager 
+item in the Tools menu,
+
+To check for newer versions of the extension visit https://github.com/jesse99/HightlightLine[github].
+
+
+jesse9jones@gmail.com
