@@ -16,7 +16,7 @@ namespace HighlightLine
 
 	[Export(typeof(EditorFormatDefinition))]
 	[ClassificationType(ClassificationTypeNames = "CurrentLine")]
-	[Name("CurrentLine")]
+	[Name("Current Line")]
 	[UserVisible(true)]
 	[Order(Before = Priority.Default)]
 	internal sealed class CurrentLineFormat : ClassificationFormatDefinition
