@@ -1,5 +1,30 @@
 asciidoc --backend=xhtml11 --out-file=README.html README.asciidoc && open README.html
 
-* Create a release checklist.
+* Release checklist:
+	- push changes
+	- upload a new zip file
+	- create a new branch for the release
+		git checkout -b releases/version-1.0
+		git push origin releases/version-1.0
+		git checkout master 
+		git branch -f releases/version-1.0 origin/releases/version-1.0
+		git checkout releases/version-1.0
+	- email
 * Release on github.
 * Release on the gallery.
+
+* Release checklist:
+	- search for TODO (in all files)
+	- update the version in the readme, the assembly, and the manifest
+	- review the readme
+	- use git log --oneline > CHANGE_LOG
+	- update CHANGES file
+	- push changes
+	- upload a new zip file
+	- create a new branch for the release
+		git checkout -b releases/version-1.0
+		git push origin releases/version-1.0
+		git checkout master 
+		git branch -f releases/version-1.0 origin/releases/version-1.0
+		git checkout releases/version-1.0
+	- email
